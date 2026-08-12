@@ -1,0 +1,552 @@
+\documentclass[11pt,a4paper]{article}
+
+% ============ PAQUETES ============
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish]{babel}
+\usepackage{geometry}
+\geometry{margin=2.3cm}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows.meta,positioning,fit,backgrounds,calc}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true, linkcolor=blue, urlcolor=blue, citecolor=blue}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{amssymb}
+
+\titleformat{\section}{\normalfont\Large\bfseries}{P\thesection}{0.6em}{}
+\renewcommand{\thesection}{\arabic{section}}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{Prueba Práctica -- Unidad IV -- ISR-401}
+\fancyhead[R]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+
+% ============ DATOS DEL ESTUDIANTE ============
+\newcommand{\nombreAlumno}{Danela Arteaga Alava}
+\newcommand{\cedulaAlumno}{0941375016}
+\newcommand{\curso}{4to ``Software A''}
+\newcommand{\fechaEntrega}{11/08/2026}
+\newcommand{\urlRepo}{https://github.com/darteagaa-boop/prueba-practica-isr401-SEMANA15}
+% \nombreAlumno, \curso, \fechaEntrega y \urlRepo deben ajustarse a los datos reales
+% antes de la entrega final.
+
+\begin{document}
+
+% ==================================================================
+% CARÁTULA
+% ==================================================================
+\begin{titlepage}
+\centering
+{\large UNIVERSIDAD TÉCNICA ESTATAL DE QUEVEDO\par}
+{\large Facultad de Ciencias de la Ingeniería\par}
+{\large Carrera de Ingeniería de Software\par}
+\vspace{1.2cm}
+{\Huge\bfseries Prueba Práctica -- Unidad IV\par}
+\vspace{0.4cm}
+{\Large Validación, Gestión, Herramientas y Estándares de Requisitos\par}
+\vspace{0.3cm}
+{\large Asignatura: Ingeniería de Requisitos (ISR-401)\par}
+{\large Docente: Ing. Gleiston Guerrero, Mg.\par}
+\vspace{0.7cm}
+
+\begin{tabular}{ll}
+\textbf{Estudiante:} & \nombreAlumno \\[4pt]
+\textbf{Cédula:} & \cedulaAlumno \\[4pt]
+\textbf{Curso:} & \curso \\[4pt]
+\textbf{Fecha:} & \fechaEntrega \\[4pt]
+\textbf{Caso:} & Sistema de Gestión de Pedidos \\
+\end{tabular}
+
+\vspace{0.7cm}
+\textbf{\large URL del repositorio (línea única):}\\[6pt]
+{\large\url{\urlRepo}}
+
+\vspace{0.6cm}
+\textbf{\normalsize Captura del resumen del cuestionario (SGA)}\\[4pt]
+\fbox{\includegraphics[width=0.6\linewidth]{figuras/resumen_sga.png}}
+
+\vspace{0.5cm}
+\textbf{\normalsize Captura de la evaluación / intento (SGA)}\\[4pt]
+\fbox{\includegraphics[width=0.6\linewidth]{figuras/intento_sga.png}}
+
+\vfill
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+% ==================================================================
+\section{Modelo de datos -- Diagrama de clases UML}
+\label{sec:p1}
+
+Diagrama de clases UML del dominio del \emph{Sistema de Gestión de Pedidos}, con las
+clases \textbf{Cliente}, \textbf{Pedido}, \textbf{LíneaPedido} y \textbf{Producto}, sus
+atributos tipados, una operación relevante por clase y las multiplicidades en cada
+asociación. Los identificadores de cada clase se muestran subrayados.
+
+\begin{figure}[h!]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}[
+  class/.style={rectangle, draw=black, thick, inner sep=0pt},
+  >=Stealth
+]
+
+% ---- Cliente ----
+\node[class] (cliente) at (0,0) {%
+  \begin{tabular}{@{\ }l@{\ }}
+  \textbf{Cliente} \\
+  \hline
+  \underline{cedulaRUC : string} \\
+  nombre : string \\
+  correo : string \\
+  \hline
+  + realizarPedido() \\
+  \end{tabular}%
+};
+
+% ---- Pedido ----
+\node[class, right=3.6cm of cliente] (pedido) {%
+  \begin{tabular}{@{\ }l@{\ }}
+  \textbf{Pedido} \\
+  \hline
+  \underline{idPedido : string} \\
+  fecha : date \\
+  total : decimal \\
+  estado : string \\
+  \hline
+  + confirmarPedido() \\
+  \end{tabular}%
+};
+
+% ---- LineaPedido ----
+\node[class, right=3.6cm of pedido] (linea) {%
+  \begin{tabular}{@{\ }l@{\ }}
+  \textbf{LíneaPedido} \\
+  \hline
+  cantidad : integer \\
+  subtotal : decimal \\
+  \hline
+  + calcularSubtotal() \\
+  \end{tabular}%
+};
+
+% ---- Producto ----
+\node[class, below=2.4cm of linea] (producto) {%
+  \begin{tabular}{@{\ }l@{\ }}
+  \textbf{Producto} \\
+  \hline
+  \underline{código : string} \\
+  descripcion : string \\
+  precio : decimal \\
+  stock : integer \\
+  \hline
+  + verificarStockProducto() \\
+  \end{tabular}%
+};
+
+\draw[-] (cliente) -- (pedido);
+\node[font=\scriptsize] at ($(cliente.east)+(0.5,0.35)$) {1};
+\node[font=\scriptsize] at ($(pedido.west)+(-0.5,0.35)$) {0..n};
+
+\draw[-] (pedido) -- (linea);
+\node[font=\scriptsize] at ($(pedido.east)+(0.5,0.35)$) {1};
+\node[font=\scriptsize] at ($(linea.west)+(-0.5,0.35)$) {1..n};
+
+\draw[-] (linea) -- (producto);
+\node[font=\scriptsize] at ($(linea.south)+(-0.4,-0.25)$) {1..n};
+\node[font=\scriptsize] at ($(producto.north)+(-0.4,0.25)$) {1};
+
+\end{tikzpicture}%
+}
+\caption{Diagrama de clases UML del dominio (P1).}
+\label{fig:p1}
+\end{figure}
+
+\textbf{Multiplicidades:} un \emph{Cliente} realiza 0..n \emph{Pedidos}; un \emph{Pedido}
+contiene 1..n \emph{LíneaPedido}; cada \emph{LíneaPedido} referencia exactamente 1
+\emph{Producto} y un \emph{Producto} puede aparecer en 1..n \emph{LíneaPedido}.
+
+\newpage
+% ==================================================================
+\section{Modelo funcional -- Diagrama de actividades UML}
+\label{sec:p2}
+
+Proceso \textbf{``Registrar pedido''}, modelado con carriles de responsabilidad
+(\emph{Cliente} / \emph{Sistema}), nodo inicial, una decisión (\textit{¿Hay stock?}),
+los dos caminos alternativos (confirmar pedido / notificar faltante), su convergencia
+y el nodo final.
+
+\begin{figure}[h!]
+\centering
+\begin{tikzpicture}[
+  act/.style={rectangle, rounded corners, draw=black, thick, align=center, minimum width=3.1cm, minimum height=0.9cm, font=\small},
+  dec/.style={diamond, draw=black, thick, align=center, font=\small, inner sep=1pt},
+  >=Stealth
+]
+
+% Carriles
+\draw[thick] (-2.2,0.6) rectangle (7.6,-9.4);
+\draw[thick] (2.7,0.6) -- (2.7,-9.4);
+\node[font=\bfseries] at (0.25,0.2) {Cliente};
+\node[font=\bfseries] at (5.15,0.2) {Sistema};
+
+% Nodo inicial
+\node[circle, draw, fill=black, minimum size=0.35cm] (ini) at (0.25,-0.6) {};
+
+% Registrar datos
+\node[act] (reg) at (0.25,-1.9) {Registrar datos\\ del pedido};
+
+% Verificar stock
+\node[act] (ver) at (5.15,-1.9) {Verificar stock};
+
+% Decisión
+\node[dec] (dec) at (5.15,-3.7) {¿Hay\\ stock?};
+
+% Confirmar pedido
+\node[act] (conf) at (0.25,-5.6) {Confirmar pedido};
+
+% Notificar faltante
+\node[act] (not) at (5.15,-5.6) {Notificar producto\\ faltante};
+
+% Nodo final
+\node[circle, draw, fill=black, minimum size=0.35cm] (fin) at (0.25,-8.6) {};
+\node[circle, draw, minimum size=0.55cm] at (0.25,-8.6) {};
+
+\draw[->] (ini) -- (reg);
+\draw[->] (reg) -- (ver);
+\draw[->] (ver) -- (dec);
+\draw[->] (dec) -- node[above,font=\scriptsize]{Sí} (conf);
+\draw[->] (dec) -- node[right,font=\scriptsize]{No} (not);
+\draw[->] (conf) -- (fin);
+\draw[->] (not.south) -- ++(0,-1.5) -| (fin);
+
+\end{tikzpicture}
+\caption{Diagrama de actividades UML del proceso ``Registrar pedido'' (P2).}
+\label{fig:p2}
+\end{figure}
+
+\newpage
+% ==================================================================
+\section{Modelo de comportamiento -- Máquina de estados UML}
+\label{sec:p3}
+
+Máquina de estados del ciclo de vida de un \emph{Pedido}. Se factoriza mediante un
+superestado (\textit{Pedido Activo}) que agrupa los estados \textit{Registrado},
+\textit{Confirmado}, \textit{Enviado} y \textit{Entregado}; la transición
+\texttt{anularPedido} sale del superestado hacia \textit{Cancelado} (con guarda
+\textit{[no entregado]}), evitando repetirla en cada subestado. \textit{Entregado} y
+\textit{Cancelado} son estados finales de aceptación del ciclo de vida.
+
+\begin{figure}[h!]
+\centering
+\begin{tikzpicture}[
+  st/.style={rectangle, rounded corners, draw=black, thick, minimum width=2.6cm, minimum height=0.8cm, font=\small},
+  >=Stealth
+]
+
+\node[circle, draw, fill=black, minimum size=0.3cm] (ini) at (0,0) {};
+
+\begin{scope}[on background layer]
+\node[draw, thick, rounded corners, fit={(-1.6,-0.9) (1.6,-6.6)}, inner sep=8pt, label={[font=\small\bfseries]above:Pedido Activo}] (super) {};
+\end{scope}
+
+\node[st] (reg) at (0,-1.3) {Registrado};
+\node[st] (conf) at (0,-2.9) {Confirmado};
+\node[st] (env) at (0,-4.5) {Enviado};
+\node[st] (ent) at (0,-6.1) {Entregado};
+
+\node[st] (can) at (0,-8.4) {Cancelado};
+\node[circle, draw, minimum size=0.5cm] (finC) at (0,-9.8) {};
+\node[circle, draw, fill=black, minimum size=0.3cm] at (0,-9.8) {};
+
+\draw[->] (ini) -- (reg);
+\draw[->] (reg) -- node[right,font=\scriptsize,align=left]{confirmarPedido\\ (stock mayor a 0)} (conf);
+\draw[->] (conf) -- node[right,font=\scriptsize]{despacharPedido} (env);
+\draw[->] (env) -- node[right,font=\scriptsize]{entregarPedido} (ent);
+
+\draw[->] (super.east) -- ++(1.6,0) |- node[pos=0.25, right, font=\scriptsize, align=left]{anularPedido\\ (no entregado)} (can.east);
+
+\draw[->] (can) -- (finC);
+
+\end{tikzpicture}
+\caption{Máquina de estados UML del ciclo de vida de un Pedido (P3).}
+\label{fig:p3}
+\end{figure}
+
+\newpage
+% ==================================================================
+\section{Consistencia entre las tres perspectivas}
+\label{sec:p4}
+
+Tabla de verificación cruzada entre el evento (P3), la acción de actividad (P2) y el
+elemento de datos que modifica (P1).
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{lll}
+\toprule
+\textbf{Evento (P3)} & \textbf{Acción (P2)} & \textbf{Elemento (P1)} \\
+\midrule
+confirmarPedido & Confirmar Pedido & Pedido.estado \\
+despacharPedido & Despachar Pedido & Pedido.estado \\
+entregarPedido  & Entregar Pedido  & Pedido.estado \\
+anularPedido    & Anular Pedido    & Pedido.estado \\
+verificarStock  & Verificar Stock  & Producto.stock \\
+\bottomrule
+\end{tabular}
+\caption{Tabla de verificación cruzada P1--P2--P3.}
+\label{tab:p4}
+\end{table}
+
+\subsection*{Inconsistencia detectada y corrección}
+
+Se detecta que el evento \texttt{despacharPedido} existe en la máquina de estados
+(P3), pero \textbf{no} tiene una acción equivalente en el diagrama de actividades
+(P2), el cual solo modela ``Registrar pedido'' hasta su confirmación o el aviso de
+faltante.
+
+\textbf{Corrección aplicada:} se extiende conceptualmente el flujo del proceso de
+negocio, añadiendo -- a continuación de ``Confirmar pedido'' -- las actividades
+\textit{Despachar pedido} y \textit{Entregar pedido} en el carril \textit{Sistema},
+de modo que el diagrama de actividades completo cubra todo el ciclo de vida
+representado en la máquina de estados y quede así trazado en la Tabla~\ref{tab:p4}.
+
+\newpage
+% ==================================================================
+\section{Especificación de requisitos con esquema de atributos}
+\label{sec:p5}
+
+Se especifican 2 requisitos funcionales y 2 no funcionales. Cada requisito no
+funcional referencia una característica de \textbf{ISO/IEC 25010:2023} con métrica y
+umbral.
+
+\begin{table}[h!]
+\centering\small
+\begin{tabular}{ll}
+\toprule
+\multicolumn{2}{l}{\textbf{RF-01 -- El sistema debe registrar pedidos de clientes}} \\
+\midrule
+Prioridad & Alta \\
+Estado & Aprobado \\
+Fuente & Cliente \\
+Estabilidad & Alta \\
+Versión & 1.0 \\
+Verificación & Prueba funcional \\
+\bottomrule
+\end{tabular}
+\hfill
+\begin{tabular}{ll}
+\toprule
+\multicolumn{2}{l}{\textbf{RF-02 -- El sistema debe verificar stock antes}} \\
+\multicolumn{2}{l}{\textbf{de confirmar un pedido}} \\
+\midrule
+Prioridad & Alta \\
+Estado & Aprobado \\
+Fuente & Empresa \\
+Estabilidad & Alta \\
+Versión & 1.0 \\
+Verificación & Prueba funcional \\
+\bottomrule
+\end{tabular}
+
+\vspace{0.6cm}
+
+\begin{tabular}{ll}
+\toprule
+\multicolumn{2}{l}{\textbf{RNF-01 -- Eficiencia de desempeño (ISO/IEC 25010:2023)}} \\
+\multicolumn{2}{l}{El sistema deberá registrar pedidos en menos de 3 segundos} \\
+\midrule
+Métrica & Tiempo de respuesta \\
+Umbral & $<$ 3 segundos \\
+Prioridad & Alta \\
+Estado & Aprobado \\
+Fuente & Empresa \\
+Estabilidad & Media \\
+Versión & 1.0 \\
+Verificación & Prueba de rendimiento \\
+\bottomrule
+\end{tabular}
+\hfill
+\begin{tabular}{ll}
+\toprule
+\multicolumn{2}{l}{\textbf{RNF-02 -- Seguridad (ISO/IEC 25010:2023)}} \\
+\multicolumn{2}{l}{Los datos personales deberán almacenarse cifrados} \\
+\midrule
+Métrica & Porcentaje de datos cifrados \\
+Umbral & 100\% \\
+Prioridad & Alta \\
+Estado & Aprobado \\
+Fuente & Legislación \\
+Estabilidad & Alta \\
+Versión & 1.0 \\
+Verificación & Auditoría de seguridad \\
+\bottomrule
+\end{tabular}
+\caption{Esquema de atributos de los requisitos RF-01, RF-02, RNF-01 y RNF-02.}
+\end{table}
+
+\newpage
+% ==================================================================
+\section{Priorización MoSCoW}
+\label{sec:p6}
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{lll}
+\toprule
+\textbf{Requisito} & \textbf{Categoría} & \textbf{Justificación} \\
+\midrule
+RF-01  & Must   & Sin registro no existe pedido. \\
+RF-02  & Must   & Evita ventas sin disponibilidad de stock. \\
+RNF-01 & Should & Mejora la experiencia del usuario. \\
+RNF-02 & Could  & Se implementa gradualmente, aunque es importante para la legislación. \\
+\bottomrule
+\end{tabular}
+\caption{Priorización MoSCoW de los requisitos (P6).}
+\end{table}
+
+\newpage
+% ==================================================================
+\section{Validación por inspección (ISO/IEC/IEEE 29148)}
+\label{sec:p7}
+
+\subsection*{Defectos detectados}
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{ll}
+\toprule
+\textbf{Requisito} & \textbf{Defecto} \\
+\midrule
+RF-01  & No especifica qué datos registra. \\
+RF-02  & No define qué ocurre cuando no hay stock. \\
+RNF-01 & No indica la cantidad de usuarios concurrentes. \\
+RNF-02 & No especifica el algoritmo de cifrado. \\
+\bottomrule
+\end{tabular}
+\caption{Defectos detectados por inspección (identificación, sin corregir).}
+\end{table}
+
+\subsection*{Requisitos corregidos (retrabajo)}
+
+\begin{itemize}[leftmargin=1.4cm]
+\item \textbf{RF-01:} El sistema registrará pedidos con ID, fecha, cliente y total.
+\item \textbf{RF-02:} El sistema verificará stock y notificará los faltantes antes
+      de confirmar el pedido.
+\item \textbf{RNF-01:} El sistema registrará pedidos en menos de 3 segundos para
+      hasta 100 usuarios concurrentes.
+\item \textbf{RNF-02:} El sistema almacenará los datos personales utilizando
+      cifrado AES-256.
+\end{itemize}
+
+\newpage
+% ==================================================================
+\section{Pruebas de aceptación trazadas}
+\label{sec:p8}
+
+\begin{table}[h!]
+\centering\small
+\begin{tabular}{lllll}
+\toprule
+\textbf{Prueba} & \textbf{Requisito} & \textbf{Tipo} & \textbf{Entrada} & \textbf{Criterio de éxito} \\
+\midrule
+PA-01 & RF-01  & Funcional     & Pedido válido        & Pedido registrado \\
+PA-02 & RF-02  & Funcional     & Producto sin stock    & Notificación mostrada \\
+PA-03 & RNF-01 & No funcional  & 100 usuarios concurrentes & Tiempo de respuesta $<$ 3 s \\
+PA-04 & RNF-02 & No funcional  & Auditoría de datos    & Datos almacenados cifrados \\
+\bottomrule
+\end{tabular}
+\caption{Pruebas de aceptación trazadas a cada requisito (P8).}
+\end{table}
+
+\newpage
+% ==================================================================
+\section{Matriz de trazabilidad}
+\label{sec:p9}
+
+\begin{table}[h!]
+\centering\small
+\begin{tabular}{lllll l}
+\toprule
+\textbf{Req.} & \textbf{Fuente} & \textbf{P1 (Clase)} & \textbf{P2 (Actividad)} & \textbf{P3 (Estado)} & \textbf{Prueba} \\
+\midrule
+RF-01  & Cliente     & Pedido   & Registrar pedido      & Registrado & PA-01 \\
+RF-02  & Empresa     & Producto & Verificar stock        & Confirmado & PA-02 \\
+RNF-01 & Empresa     & Pedido   & Registrar / Confirmar pedido & Confirmado & PA-03 \\
+RNF-02 & Legislación & Cliente  & Registrar datos del pedido & Confirmado & PA-04 \\
+\bottomrule
+\end{tabular}
+\caption{Matriz de trazabilidad: fuente (traza hacia atrás) y modelos/pruebas (traza hacia adelante).}
+\end{table}
+
+\subsection*{Dependencia horizontal}
+\textbf{RF-02} depende de \textbf{RF-01}: no es posible verificar el stock de un
+pedido (RF-02) si el pedido aún no ha sido registrado (RF-01).
+
+\subsection*{Requisitos huérfanos}
+No existen requisitos huérfanos: los cuatro requisitos (RF-01, RF-02, RNF-01,
+RNF-02) cuentan con al menos un modelo asociado (P1--P3) y con al menos una prueba
+de aceptación asociada (P8).
+
+\newpage
+% ==================================================================
+\section{Gestión del cambio y línea base}
+\label{sec:p10}
+
+\subsection*{Solicitud de cambio}
+\textbf{SC-01:} Se solicita que el tiempo de registro de un pedido pase de 3
+segundos a 2 segundos.
+
+\subsection*{Análisis de impacto (según matriz de P9)}
+La solicitud SC-01 afecta a:
+\begin{itemize}[leftmargin=1.4cm]
+\item RNF-01 (Eficiencia de desempeño).
+\item PA-03 (prueba de aceptación de RNF-01).
+\item El diagrama de actividades (P2), en el tiempo estimado de la actividad
+      ``Registrar datos del pedido''.
+\item La documentación de requisitos (ERS).
+\end{itemize}
+
+\subsection*{Decisión del CCB (Change Control Board)}
+\textbf{Aprobada.} \checkmark
+
+\subsection*{Actualización de versión}
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+Requisito & Cambio de versión \\
+\midrule
+RNF-01 & v1.0 $\rightarrow$ v1.1 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Nuevo texto del requisito RNF-01 (v1.1):} ``El sistema registrará pedidos en
+menos de 2 segundos para hasta 100 usuarios concurrentes.''
+
+\subsection*{Línea base 1.1}
+Se declara la siguiente línea base, con la configuración congelada y coherente en
+versión 1.1:
+
+\begin{itemize}[leftmargin=1.4cm]
+\item ERS v1.1
+\item Diagrama de clases v1.1
+\item Diagrama de actividades v1.1
+\item Máquina de estados v1.1
+\item Matriz de trazabilidad v1.1
+\item Pruebas de aceptación v1.1
+\end{itemize}
+
+\end{document}
